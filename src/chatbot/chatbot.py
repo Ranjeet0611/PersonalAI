@@ -2,6 +2,7 @@ import uuid
 
 from langchain_core.prompts import PromptTemplate
 
+from src.memory.long_term_memory import LongTermMemory
 from src.memory.memory_decider import MemoryDecider
 from src.memory.short_term_memory import ShortTermMemory
 from src.ollama.ollama import Ollama
@@ -24,6 +25,7 @@ class ChatBot:
             ollama_model = Ollama()
             session_id = self.get_session_id()
             short_term_memory = ShortTermMemory()
+            long_term_memory = LongTermMemory()
             memory_decider = MemoryDecider()
             while True:
                 user_input = input("You:> ")
@@ -32,7 +34,8 @@ class ChatBot:
                     break
                 llm = ollama_model.get_model()
                 short_term_history = short_term_memory.get_short_term_memory(session_id)
-
+                search_long_term = long_term_memory.search_long_term(user_input, limit=3)
+                print(search_long_term)
                 if short_term_history:
                     short_term_history_text = "\n".join(
                         f"{m['role']}: {m['content']}" for m in short_term_history

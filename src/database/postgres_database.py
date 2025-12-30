@@ -1,4 +1,5 @@
 import psycopg2
+from pgvector.psycopg2 import register_vector
 
 
 class PostgresDatabase:
@@ -12,6 +13,7 @@ class PostgresDatabase:
                 password=password
             )
             self.connection = connection
+            register_vector(self.connection)
         except Exception as e:
             print(f"Error connecting to PostgreSQL database: {e}")
             self.connection = None

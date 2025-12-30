@@ -1,42 +1,39 @@
-from langchain_classic.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough
-from langchain_classic.memory import ConversationBufferMemory
-from langchain_classic.memory.chat_message_histories import SQLChatMessageHistory
-
-memory = None
+from src.database.postgres_database import PostgresDatabase
+from langchain_classic.embeddings import OllamaEmbeddings
 
 
 class LongTermMemory:
 
     def __init__(self):
         self.memory_type = "long-term"
-        self.memory = None
+        postgres_db = PostgresDatabase("localhost", 5432, "postgres", "postgres", "root")
+        self.db = postgres_db.get_connection()
+        self.embeddings = OllamaEmbeddings(
+            model="nomic-embed-text"
+        )
 
-    def save_memory(self, user_input, output):
-        global memory
-        memory.save_context({"input": user_input},
-                            {"output": output})
-
-    def get_memory(self, user_input: str, session_id: str, llm):
+    def save_into_memory(self, user_input, output):
         try:
-            prompt_template = ChatPromptTemplate(
-                [("system", "You are a helpful AI assistant."), MessagesPlaceholder(variable_name="history"),
-                 ("human", f"{user_input}")])
-            global memory
-            memory = ConversationBufferMemory(chat_memory=SQLChatMessageHistory(
-                connection_string="postgresql+psycopg2://postgres:root@localhost:5432/postgres",
-                session_id=session_id), return_messages=True)
-            chain = (RunnablePassthrough.assign(history=lambda x: memory.chat_memory.messages)
-                     | prompt_template | llm)
-            return chain
+            text_to_store = f"User: {user_input}\nAssistant: {output}"
+            cursor = self.db.cursor()
+            embedding = self.embeddings.embed_query(text_to_store)
+            cursor.execute("INSERT INTO long_term_memory (content, embedding) VALUES (%s, %s)",
+                           (text_to_store, embedding))
+            self.db.commit()
+            cursor.close()
         except Exception as e:
-            print(f"Failed to initialize long term memory: {e}")
-            return None
+            print("Failed to save into long term memory:", e)
 
-    def get_history(self):
-        try:
-            global memory
-            return memory.chat_memory.messages
-        except Exception as e:
-            print(f"Failed to get history: {e}")
-            return None
+    def search_long_term(self, query: str, limit=3):
+        query_embedding = self.embeddings.embed_query(query)
+        cursor = self.db.cursor()
+        cursor.execute(
+            """
+            SELECT content
+            FROM long_term_memory
+            ORDER BY embedding <-> %s::vector
+            LIMIT %s
+            """,
+            (query_embedding, limit)
+        )
+        return [row[0] for row in cursor.fetchall()]
