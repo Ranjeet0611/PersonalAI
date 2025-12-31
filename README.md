@@ -32,9 +32,9 @@ PersonalAI is a privacy-focused, local AI assistant that combines the power of O
             Quick fix for the extension error: sudo apt install postgresql-17-pgvector (for Linux).
     
         Models: Pull your preferred model:
-        Bash
     
-            ollama pull llama3
+            ollama run llama3.1:8b
+            ollama pull nomic-embed-text:v1.5
 
 2. Installation
    
@@ -82,4 +82,13 @@ PersonalAI is a privacy-focused, local AI assistant that combines the power of O
     
     ALTER TABLE IF EXISTS public.short_term_memory
         OWNER to postgres;
- 4. Run Agent.py       
+        
+
+ 4. Run Application
+    
+         main.py - for CLI application
+         agent.py - for web based application
+
+         <img width="1897" height="625" alt="image" src="https://github.com/user-attachments/assets/78cc6ef8-e3b1-43b4-aafc-d7cda73de688" />
+
+           
