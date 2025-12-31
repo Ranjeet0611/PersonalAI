@@ -5,7 +5,7 @@ from src.memory.memory_decider import MemoryDecider
 from src.memory.short_term_memory import ShortTermMemory
 from langchain_core.prompts import PromptTemplate
 from src.ollama.ollama import Ollama
-
+import asyncio
 
 def get_session_id():
     return str(uuid.uuid4())
@@ -58,8 +58,8 @@ class CLIChatbot:
 
                 chain = prompt | llm
                 response = chain.invoke({"user_input": user_input, "short_term_history": short_term_history_text})
-                memory_decider.save_to_memory(llm=llm, session_id=session_id, user_input=user_input,
-                                              output=response.content, user_conversation=user_input)
+                asyncio.run(memory_decider.save_to_memory(llm=llm, session_id=session_id, user_input=user_input,
+                                              output=response.content, user_conversation=user_input))
                 print("ChatBot:>", response.content)
         except Exception as e:
             print(f"Error in CLI chat: {e}")
