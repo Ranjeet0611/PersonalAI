@@ -17,8 +17,8 @@ class LongTermMemory:
             text_to_store = f"User: {user_input}\nAssistant: {output}"
             cursor = self.db.cursor()
             embedding = self.embeddings.embed_query(text_to_store)
-            cursor.execute("INSERT INTO long_term_memory (content, embedding) VALUES (%s, %s)",
-                           (text_to_store, embedding))
+            cursor.execute("INSERT INTO long_term_memory (user_input,content, embedding,output) VALUES (%s, %s,%s, %s)",
+                           (user_input, text_to_store, embedding, output))
             self.db.commit()
             cursor.close()
         except Exception as e:
@@ -29,11 +29,16 @@ class LongTermMemory:
         cursor = self.db.cursor()
         cursor.execute(
             """
-            SELECT content
+            SELECT user_input,output
             FROM long_term_memory
             ORDER BY embedding <-> %s::vector
             LIMIT %s
             """,
             (query_embedding, limit)
         )
-        return [row[0] for row in cursor.fetchall()]
+        messages = []
+        for row in cursor.fetchall():
+            user_input, output = row
+            messages.append({"role": "user", "content": user_input})
+            messages.append({"role": "assistant", "content": output})
+        return messages

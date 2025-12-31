@@ -34,12 +34,9 @@ class ChatBot:
                     break
                 llm = ollama_model.get_model()
                 short_term_history = short_term_memory.get_short_term_memory(session_id)
-                search_long_term = long_term_memory.search_long_term(user_input, limit=3)
-                print(search_long_term)
-                if short_term_history:
-                    short_term_history_text = "\n".join(
-                        f"{m['role']}: {m['content']}" for m in short_term_history
-                    )
+                long_term_history = long_term_memory.search_long_term(user_input, limit=3)
+                if short_term_history or long_term_history:
+                    short_term_history_text = self.get_history_messages(long_term_history, short_term_history)
                 else:
                     short_term_history_text = ""
 
@@ -55,9 +52,18 @@ class ChatBot:
 
                 chain = prompt | llm
                 response = chain.invoke({"user_input": user_input, "short_term_history": short_term_history_text})
-                conversation = self.get_conversation(user_input, response.content)
                 memory_decider.save_to_memory(llm=llm, session_id=session_id, user_input=user_input,
-                                              output=response.content, user_conversation=conversation)
+                                              output=response.content, user_conversation=user_input)
                 print("ChatBot:>", response.content)
         except Exception as e:
             print(f"Error during chat: {e}")
+
+    def get_history_messages(self, long_term_history, short_term_history):
+        short_term_history_text = "\n".join(
+            f"{m['role']}: {m['content']}" for m in short_term_history
+        )
+        long_term_history_text = "\n".join(
+            f"{m['role']}: {m['content']}" for m in long_term_history
+        )
+        short_term_history_text += "\n" + long_term_history_text
+        return short_term_history_text
