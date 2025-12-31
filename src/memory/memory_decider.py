@@ -4,8 +4,9 @@ from src.memory.long_term_memory import LongTermMemory
 
 
 class MemoryDecider(object):
-    def save_to_memory(self, llm, session_id, user_input, output, user_conversation):
+    async def save_to_memory(self, llm, session_id, user_input, output, user_conversation):
         try:
+            print("Saving to memory...")
             system_prompt = ""
             with open("storage_prompt.txt","r") as file:
                 system_prompt = file.read()
@@ -20,5 +21,6 @@ class MemoryDecider(object):
             elif "long-term" in response.content.lower():
                 long_term_memory = LongTermMemory()
                 long_term_memory.save_into_memory(user_input=user_input, output=output)
+            print("Saved to memory...")
         except Exception as e:
             print(f"Failed to decide memory: {e}")
