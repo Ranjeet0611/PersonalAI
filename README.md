@@ -89,6 +89,6 @@ PersonalAI is a privacy-focused, local AI assistant that combines the power of O
          main.py - for CLI application
          agent.py - for web based application
 
-         <img width="1897" height="625" alt="image" src="https://github.com/user-attachments/assets/78cc6ef8-e3b1-43b4-aafc-d7cda73de688" />
+<img width="1897" height="625" alt="image" src="https://github.com/user-attachments/assets/78cc6ef8-e3b1-43b4-aafc-d7cda73de688" />
 
            
