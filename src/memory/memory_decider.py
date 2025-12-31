@@ -6,11 +6,14 @@ from src.memory.long_term_memory import LongTermMemory
 class MemoryDecider(object):
     def save_to_memory(self, llm, session_id, user_input, output, user_conversation):
         try:
-            prompt_template = ChatPromptTemplate([("system",
-                                                   "You're a helpful AI assistant. Decide whether to store the following user conversation in short-term or long-term memory or no need to store. If the information is already stored, do not store it again. Respond with only 'short-term', 'long-term', or 'None'."),
+            system_prompt = ""
+            with open("storage_prompt.txt","r") as file:
+                system_prompt = file.read()
+            prompt_template = ChatPromptTemplate([("system", f"{system_prompt}"),
                                                   ("human", f"{user_conversation}")])
             chain = prompt_template | llm
             response = chain.invoke({"user_input": user_conversation})
+            print("Memory decider ",response.content)
             if "short-term" in response.content.lower():
                 short_term_memory = ShortTermMemory()
                 short_term_memory.save_into_memory(session_id=session_id, user_input=user_input, output=output)
