@@ -1,5 +1,6 @@
 from src.database.postgres_database import PostgresDatabase
 from langchain_classic.embeddings import OllamaEmbeddings
+from src.constant import constant
 
 
 class LongTermMemory:
@@ -9,7 +10,7 @@ class LongTermMemory:
         postgres_db = PostgresDatabase("localhost", 5432, "postgres", "postgres", "root")
         self.db = postgres_db.get_connection()
         self.embeddings = OllamaEmbeddings(
-            model="nomic-embed-text"
+            model=constant.EMBEDDING_MODEL_NAME
         )
 
     def save_into_memory(self, user_input, output):

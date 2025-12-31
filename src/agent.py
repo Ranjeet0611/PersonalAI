@@ -5,4 +5,4 @@ def chat(message, history):
     chatbot = ChatBot()
     return chatbot.chat(message,"WEB")
 
-gr.ChatInterface(chat, title="PersonalAI").launch()
+gr.ChatInterface(chat, title="Kara").launch()
