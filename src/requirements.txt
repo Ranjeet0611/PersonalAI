@@ -4,3 +4,4 @@ langchain-community
 pgcopy2-binary
 pgvector
 gradio
+langchain-ollama

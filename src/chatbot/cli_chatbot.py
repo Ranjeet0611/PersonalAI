@@ -4,7 +4,7 @@ from src.memory.long_term_memory import LongTermMemory
 from src.memory.memory_decider import MemoryDecider
 from src.memory.short_term_memory import ShortTermMemory
 from langchain_core.prompts import PromptTemplate
-from src.ollama.ollama import Ollama
+from src.models.ollama import Ollama
 import asyncio
 
 def get_session_id():

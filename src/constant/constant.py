@@ -1,4 +1,5 @@
 OLLAMA_MODEL_NAME = "llama3.1:8b"
+OLLAMA_MODEL_WITH_TOOL_NAME = "llama3-groq-tool-use:8b"
 CHAT_HISTORY_INPUT_KEY = "history"
 USER_CHAT_INPUT_KEY = "user_input"
 CLI_APP_TYPE = "CLI"

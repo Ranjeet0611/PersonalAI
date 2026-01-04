@@ -4,9 +4,8 @@ from src.memory.long_term_memory import LongTermMemory
 from src.memory.memory_decider import MemoryDecider
 from src.memory.short_term_memory import ShortTermMemory
 from langchain_core.prompts import PromptTemplate
-from src.ollama.ollama import Ollama
-
-
+from src.models.ollama import Ollama
+from src.tools import tool_decider
 def get_session_id():
     return str(uuid.uuid4())
 
@@ -33,10 +32,14 @@ class WebChatbot:
             short_term_memory = ShortTermMemory()
             long_term_memory = LongTermMemory()
             memory_decider = MemoryDecider()
+            tool = tool_decider.ToolDecider()
             if "exit" in user_input:
                 short_term_memory.clear_short_term_memory(session_id=session_id)
                 return "Bye!"
             llm = ollama_model.get_model()
+            tool_response = tool.decide(user_input)
+            if tool_response.get('tool_used'):
+                return tool_response.get('response').content
             short_term_history = short_term_memory.get_short_term_memory(session_id)
             long_term_history = long_term_memory.search_long_term(user_input, limit=3)
             if short_term_history or long_term_history:

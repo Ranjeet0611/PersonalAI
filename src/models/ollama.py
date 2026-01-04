@@ -1,5 +1,5 @@
-from langchain_community.chat_models import ChatOllama
 from src.constant import constant
+from langchain_ollama import ChatOllama
 
 
 class Ollama:
